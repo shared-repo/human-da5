@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+
+<persons count="2">
+    <person id="1">
+        <name>John Doe</name>
+        <phone>010-6523-7854</phone>
+        <email>johndoe@example.com</email>
+        <age /> <!-- <age></age> -->    
+    </person>
+
+    <person id="2">
+        <name>Jane Doe</name>
+        <phone>010-2589-6541</phone>
+        <email>janedoe@example.com</email>
+        <desc>my name is &lt;Jane Doe&gt; </desc>
+        <![CDATA[ 이 영역의 데이터는 <XML> 문법 적용을 받지 않습니다. ]]>
+    </person>
+</persons>
