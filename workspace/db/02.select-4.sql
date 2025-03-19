@@ -27,6 +27,11 @@ UNION -- 자동 중복 제거
 UNION ALL -- 중복 제거 x
 (SELECT * FROM 학생 WHERE 학년 BETWEEN 2 AND 4 ORDER BY 학년);
 
+-- 3-4.
+SELECT 이름, 학년 FROM 학생
+UNION ALL -- 서로 다른 데이터도 병합 가능 (컬럼수와 형식만 일치하면)
+SELECT 이름, 나이 FROM 학생;
+
 
 
 
