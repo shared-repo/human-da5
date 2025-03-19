@@ -1,4 +1,5 @@
 -- madang_db로 작업 데이터베이스 변경
+USE madang_db;
 
 -- (1) 도서번호가 1인 도서의 이름 ( book )
 SELECT *
@@ -39,11 +40,20 @@ FROM book;
 SELECT name, address
 FROM customer;
 
--- (8) 2014년 7월 4일~7월 7일 사이에 주문 받은 도서의 주문번호 ( orders )
+-- 테스트
+SELECT NOW(); -- CURRENT_TIMESTAMP()와 같은 함수 : 년-월-일 시:분:초, ...
+SELECT CURRENT_TIMESTAMP();
+SELECT CURDATE(), current_date(); -- 두 함수는 같은 함수 : 년-월-일
+
+-- 12.32 -- 숫자 표현
+-- '문자열' -- 문자열 표현
+-- '2025-03-19' -- 날짜 표현?
+
+-- (8) 2014년 7월 4일 ~ 7월 7일 사이에 주문 받은 도서의 주문번호 ( orders )
 SELECT *
 FROM orders
--- WHERE orderdate BETWEEN '2014-07-04' AND '2014-07-07';
-WHERE orderdate >= '2014-07-04' AND orderdate <= '2014-07-07';
+WHERE orderdate BETWEEN '2014-07-04' AND '2014-07-07';
+-- WHERE orderdate >= '2014-07-04' AND orderdate <= '2014-07-07';
 
 -- (9) 2014년 7월 4일~7월 7일 사이에 주문 받은 도서를 제외한 도서의 주문번호 ( orders )
 SELECT *
