@@ -39,7 +39,7 @@ where 학번 = ( select 학번
 select * 
 from 학생 
 -- where 학번 IN ( 's001', 's003', 's004' )
-where 학번 in ( select 학번 
+where 학번 IN ( select 학번 
 			   from 수강 
                where 과목번호 = 'c002' );
                

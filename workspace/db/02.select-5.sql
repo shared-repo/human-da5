@@ -45,3 +45,17 @@ select *
 from rental
 where return_date is not null
 order by return_date desc;
+
+-- ---------------------------------------------
+
+-- 11. 'MARY SMITH' 고객의 대여 내역 조회
+select * from customer;
+select * from rental;
+
+select * 
+from rental
+where customer_id = ( select customer_id
+					  from customer
+                      where first_name='MARY' 
+							and 
+                            last_name='SMITH' )
