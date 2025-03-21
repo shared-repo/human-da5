@@ -101,9 +101,66 @@ VALUES ('테스트1', 1, '테스트1');
 INSERT INTO 과목8 (이름, 강의실, 개설학과)
 VALUES ('테스트2', 2, '테스트2');
 
--- 2-8. 테이블 만들기 ( 관계 만들기 - Foreign Key )
+-- 2-8. 테이블 만들기 ( 제약조건 - UNIQUE )
+CREATE TABLE `학생2` (
+  `학번` char(4) NOT NULL,
+  `이름` varchar(20) NOT NULL,
+  `주소` varchar(50) DEFAULT '미정',
+  `학년` int NOT NULL,
+  `나이` int DEFAULT NULL,
+  `성별` char(1) NOT NULL,
+  `휴대폰번호` char(14) DEFAULT NULL,
+  `소속학과` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`학번`),
+  UNIQUE (`휴대폰번호`)
+);
 
+-- 2-9. 테이블 만들기 ( 관계 만들기 - Foreign Key )
+CREATE TABLE `수강2` (
+  `학번` char(6) NOT NULL,
+  `과목번호` char(4) NOT NULL,
+  `신청날짜` date NOT NULL,
+  `중간성적` int DEFAULT '0',
+  `기말성적` int DEFAULT '0',
+  `평가학점` char(1) DEFAULT NULL,
+  PRIMARY KEY (`학번`,`과목번호`),
+  FOREIGN KEY (`학번`) REFERENCES 학생2(학번),
+  FOREIGN KEY (`과목번호`) REFERENCES 과목7(과목번호)
+);
 
+-- 2-10. 테이블 사이의 데이터 복제 (복사) : 과목 -> 과목7
+insert into 과목7
+select * from 과목;
+
+select * from 과목7;
+
+-- 2-11. 다른 테이블을 기반으로 복제된 테이블 만들기
+CREATE TABLE 학생3
+AS
+SELECT * FROM 학생;
+
+SELECT * FROM 학생3;
+
+-- 3-1. 테이블 수정 (변경)
+ALTER TABLE 과목6
+ADD COLUMN 과목설명 VARCHAR(500) NULL
+, CHANGE COLUMN 이름 이름 VARCHAR(50) NOT NULL
+, CHANGE COLUMN 시수 학점 SMALLINT NOT NULL
+-- , DROP COLUMN 강의실
+-- , ADD CONSTRAINT `constraint_name` FOREIGN KEY (`column_name`) REFERENCES `TABLE_NAME`(`COLUMN_NAME`);
+;
+
+-- 4-1. 테이블 제거 (삭제)
+DROP TABLE IF EXISTS 과목2;
+DROP TABLE 과목3;
+DROP TABLE 과목4;
+DROP TABLE 과목5;
+DROP TABLE 과목6;
+
+DROP TABLE 과목7; -- 오류 : 다른 테이블이 과목7 테이블을 외래키로 참조 -> 참조하는 테이블을 제거한 후 삭제 가능
+
+DROP TABLE 수강2;
+DROP TABLE 과목7;
 
 
 
