@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event</title>
+</head>
+<body>
+
+    <table border="1" width="600" height="70" align="center">
+        <tr>
+            <td id="red" style="background-color: red;"></td>
+            <td id="orange" style="background-color: orange;"></td>
+            <td id="yellow" style="background-color: yellow;"></td>
+            <td id="green" style="background-color: green;"></td>
+            <td id="blue" style="background-color: blue;"></td>
+            <td id="navy" style="background-color: navy;"></td>
+            <td id="purple" style="background-color: purple;"></td>
+            <td id="random"></td>
+        </tr>
+    </table>
+    <br>
+    <div id="canvas" style="border: solid 1px; width:600px; height:400px; margin:0 auto"></div>
+
+    <script>
+
+        // const tds = document.querySelector("td"); // querySelector : td 1개 (첫 번째 td) 찾기
+        const tds = document.querySelectorAll("td"); // querySelectorAll : 모든 td 찾기
+        alert( tds.length ); // 갯수 출력
+        
+        
+    </script>
+    
+</body>
+</html>
