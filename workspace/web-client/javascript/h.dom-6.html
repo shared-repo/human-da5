@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM Element</title>
+</head>
+<body>
+    <table border="1" align="center">
+        <tr>
+            <td>
+                달러 : <input id="dollar" type="text">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <button id="exchangeBtn" style="width:100%">변환</button>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                원 : <input id="won" type="text">
+            </td>
+        </tr>
+    </table>
+    <script>
+        const exchangeBtn = document.querySelector('#exchangeBtn');
+        exchangeBtn.onclick = function(event) {
+
+            const dollar = document.querySelector('#dollar');
+            const dollarValue = parseFloat(dollar.value); // parserFloat : "11.11" -> 11.11
+
+            const won = document.querySelector('#won');
+            won.value = dollarValue * 1466;
+
+        }
+
+    </script>
+    
+</body>
+</html>

@@ -24,9 +24,33 @@
 
     <script>
 
+        // 3. id='canvas'인 div 찾기
+        const canvas = document.querySelector('#canvas');
+
+        // 1. 모든 td 찾기
         // const tds = document.querySelector("td"); // querySelector : td 1개 (첫 번째 td) 찾기
         const tds = document.querySelectorAll("td"); // querySelectorAll : 모든 td 찾기
-        alert( tds.length ); // 갯수 출력
+        // alert( tds.length ); // 갯수 출력
+
+        // 2. 각 td에 클릭 이벤트 처리기 연결하기
+        // for (td of tds) {
+        // for (idx in tds) {
+        for (let i = 0; i < tds.length - 1; i++) { // i++ == i += 1 == i = i + 1
+            tds[i].onclick = function(event) {                
+                // 4. 찾은 div의 색상을 변경
+                const currentTd = event.target; // event.target : 현재 이벤트가 발생한 객체
+                canvas.style.backgroundColor = currentTd.style.backgroundColor; // red?, orange?, green? -> 현재 click된 td의 배경색
+            }
+        }
+
+        tds[tds.length-1].onclick = (event) => { 
+            r = Math.floor(Math.random() * 256); // 0 ~ 255(포함) 정수
+            g = Math.floor(Math.random() * 256); // 0 ~ 255(포함) 정수
+            b = Math.floor(Math.random() * 256); // 0 ~ 255(포함) 정수
+            canvas.style.backgroundColor = `rgb(${r},${g},${b})`; // 색상 스타일 값 : rgb(빨,초,파)
+        }
+
+
         
         
     </script>
