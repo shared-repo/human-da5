@@ -9,5 +9,4 @@ def create_app(): # Flask framework와 약속된 이름의 함수 (역할 : appl
         # return "hello flask"
         return render_template("index.html") # templates/index.html을 찾아서 처리한 후 응답
 
-
     return app
