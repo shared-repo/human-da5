@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 
 def create_app(): # Flask framework와 약속된 이름의 함수 (역할 : application 생성)
 
@@ -25,5 +25,14 @@ def create_app(): # Flask framework와 약속된 이름의 함수 (역할 : appl
     def process_path_variable(data1):
         print("---------------->", data1)
         return "receive path variable"
+    
+    @app.route("/redirect/")
+    def process_redirect():
+        # return redirect("/redirect-target")       # redirect 대상 경로를 직접 적용
+        return redirect(url_for("redirect_target")) # redirect 대상 route 함수를 통해 경로 간접 적용
+
+    @app.route("/redirect-target/")
+    def redirect_target():
+        return "The end of redirect"
 
     return app
