@@ -11,7 +11,7 @@ def select_rand_number(cnt=1):
 
 print(__name__) # __name__ : import로 실행하면 모듈의 이름 출력. python 명령으로 실행하면 "__main__" 출력
 
-if __name__ == "__main__":
+if __name__ == "__main__": # python 명령으로 실행할 때에만 실행하도록 조건 구성
     r = greetings("John Doe")
     print(r)
     r = select_rand_number(5)
