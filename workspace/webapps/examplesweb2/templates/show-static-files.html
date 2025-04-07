@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Use Static Files</title>
+</head>
+<body>
+    
+    <img src="/static/images/nature1.jpg" style="width:400px;">
+    <hr>
+    <img src="{{ url_for('static', filename='images/nature2.jpg') }}" style="width:400px;">
+
+</body>
+</html>

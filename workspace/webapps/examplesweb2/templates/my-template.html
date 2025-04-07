@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template Syntax</title>
+</head>
+<body>
+    
+    <h2>Template Syntax Example</h2>
+    <hr>
+    <h3>DATA A</h3>
+    {% for n in dataa %}
+    {#
+        {% if n % 2 == 0 %}
+        [<span style="color:blue">{{ n }}</span>]
+        {% else %}
+        [<span style="color:orange">{{ n }}</span>]
+        {% endif %}
+    #}
+        [<span style="color:{{ 'blue' if n % 2 == 0 else 'orange' }}">{{ n }}</span>]
+    {% endfor %}
+    <br><br>
+
+    <h3>DATA B</h3>
+    {% for k, v in datab.items() %}
+        [<span style="color:red">{{k}} : {{v}}</span>]
+    {% endfor %}
+</body>
+</html>

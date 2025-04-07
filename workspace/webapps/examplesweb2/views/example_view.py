@@ -6,12 +6,16 @@ example_bp = Blueprint("example", __name__, url_prefix="/")
 def process_get_data():
     print("---------------->", request.method) # 현재 요청의 전송 방식 확인
     print("---------------->", request.args['message1'], request.args['message2']) # args : get 방식 요청 데이터 읽기
+    # print("---------------->", request.args['message3']) # 요청에 포함되지 않은 데이터를 읽으면 오류
+    print("---------------->", request.args.get('message3', 'not available')) # 없으면 'not available' 사용
     return "receive get request"
 
 @example_bp.route("/process-data/", methods=['POST']) # POST 방식의 요청만 수신
 def process_post_data():
     print("---------------->", request.method) # 현재 요청의 전송 방식 확인
     print("---------------->", request.form['message1'], request.form['message2']) # form : post 방식 요청 데이터 읽기
+    # print("---------------->", request.form['message3']) # 요청에 포함되지 않은 데이터를 읽으면 오류
+    print("---------------->", request.form.get('message3', 'not available')) # 없으면 'not available' 사용
     return "receive post request"
 
 @example_bp.route("/path-variable/<data1>/")
@@ -28,7 +32,7 @@ def process_redirect():
 def redirect_target():
     return "The end of redirect"
 
-@example_bp.route("/template-syntax")
+@example_bp.route("/template-syntax/")
 def template_syntax():
     # 1. 요청 데이터 읽기
     # 2. 요청 처리
@@ -36,3 +40,7 @@ def template_syntax():
     data2 = { 'name': 'john doe', 'email': 'johndoe@example.com' }
     # 3. 응답 컨텐츠 만들기 --> template에게 요청 (사용할 html 파일과 전달할 데이터 지정)
     return render_template('my-template.html', dataa=data1, datab=data2)
+
+@example_bp.route("/static-files/")
+def use_static_files():
+    return render_template("show-static-files.html")
