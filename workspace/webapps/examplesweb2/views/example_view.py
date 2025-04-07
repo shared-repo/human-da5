@@ -27,3 +27,12 @@ def process_redirect():
 @example_bp.route("/redirect-target/")
 def redirect_target():
     return "The end of redirect"
+
+@example_bp.route("/template-syntax")
+def template_syntax():
+    # 1. 요청 데이터 읽기
+    # 2. 요청 처리
+    data1 = [54, 22, 16, 39, 61]
+    data2 = { 'name': 'john doe', 'email': 'johndoe@example.com' }
+    # 3. 응답 컨텐츠 만들기 --> template에게 요청 (사용할 html 파일과 전달할 데이터 지정)
+    return render_template('my-template.html', dataa=data1, datab=data2)
