@@ -235,8 +235,15 @@
                                         </div>
                                     </div>
                                     <div class="account-dropdown__footer">
-                                        <a href="#">
+                                        {% if session.get('loginuser') %}
+                                        <a href="{{ url_for('auth.logout') }}">
                                             <i class="zmdi zmdi-power"></i>Logout</a>
+                                        {% else %}
+                                        <a href="{{ url_for('auth.login') }}">
+                                            <i class="fas fa-sign-in-alt"></i>Login</a>
+                                        <a href="#">
+                                            <i class="fas fa-user-plus"></i>Register</a>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -476,8 +483,15 @@
                                 </div>
                             </div>
                             <div class="account-dropdown__footer">
+                                {% if session.get('loginuser') %}
                                 <a href="#">
                                     <i class="zmdi zmdi-power"></i>Logout</a>
+                                {% else %}
+                                <a href="{{ url_for('auth.login') }}">
+                                    <i class="zmdi zmdi-power"></i>Login</a>
+                                <a href="#">
+                                    <i class="zmdi zmdi-power"></i>Register</a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
