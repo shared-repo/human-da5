@@ -70,6 +70,13 @@
 
     {% include "page_modules/common_js.html" %}
 
+    <script>
+        const message = '{{ message }}'; // {{ message }} : render_template('path', message='...')에서 전달
+        if (message) {
+            alert(message);
+        }
+    </script>
+
 </body>
 
 </html>

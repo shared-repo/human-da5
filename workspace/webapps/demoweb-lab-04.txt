@@ -1,0 +1,182 @@
+[ 회원가입구현 ]
+
+
+1. 회원가입 링크 구현
+
+   base.html에서 247라인 근처의 코드를 아래와 같이 수정
+
+<a href="{{ url_for('auth.register') }}">
+<i class="fas fa-user-plus"></i>Register</a>
+
+2. 회원가입 화면 요청 처리 구현
+
+   auth_view.py 에 아래 코드 추가
+
+@auth_bp.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method.lower() == 'get':
+        return render_template('auth/register.html')
+    else:
+        pass
+
+3. 회원가입 페이지 구현
+
+   templates/auth/register.html에서 다음 코드 수정
+
+    {% include "page_modules/common_css.html" %}
+
+<form action="{{ url_for('auth.register') }}" method="post">
+
+<input class="au-input au-input--full" type="password" name="passwd" placeholder="Password">
+
+    {% include 'page_modules/common_js.html' %}
+
+4. 데이터베이스 준비
+
+   visual studio code의 Database 연결 확장 사용
+  
+
+create database demoweb;
+
+grant all privileges on demoweb.* to humanda5@localhost;
+grant all privileges on demoweb.* to humanda5@"%";
+
+use demoweb;
+
+create table member
+(
+	email varchar(100) primary key,
+	passwd varchar(200) not null,
+	username varchar(20),
+	usertype varchar(20) default('user'),
+	deleted boolean default(false),
+	regdate date default(now())
+);
+
+5. 데이터베이스 연동 코드 구현
+
+    db 폴더 생성
+
+    db/member_util.py 파일 생성
+
+    insert_member 함수 구현
+
+
+import pymysql
+
+def insert_member(email, passwd, username):
+    try:
+        conn = pymysql.connect(host="localhost", 
+                               database='demoweb', 
+                               user='humanda5', 
+                               password='humanda5')
+        
+        cursor = conn.cursor()
+
+        sql = "insert into member (email, passwd, username) values (%s, %s, %s)"
+        cursor.execute(sql, (email, passwd, username))
+        conn.commit()
+    except Exception as e:
+        print('데이터 저장 실패', e)
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+6. 회원 가입 처리
+
+    auth_view.py 코드 수정
+
+@auth_bp.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method.lower() == 'get':
+        return render_template('auth/register.html')
+    else:
+        user_name = request.form.get('username')
+        email = request.form.get('email')
+        passwd = request.form.get('passwd')
+        passwd_hash = generate_password_hash(passwd)        
+        # return f'{user_name}, {email}, {passwd}'
+
+        member_util.insert_member(email, passwd_hash, user_name)
+
+        # return render_template('auth/login.html')
+        return redirect(url_for('auth.login'))
+
+
+7. 로그인 관련 데이터베이스 연동 코드 구현
+
+    db/member_util.py 파일에 함수 추가
+
+def select_member_by_email(email):
+    row = None
+    try:
+        conn = pymysql.connect(host="localhost", 
+                               database='demoweb', 
+                               user='humanda5', 
+                               password='humanda5')
+        
+        cursor = conn.cursor()
+
+        sql = """select email, passwd, username, usertype, regdate 
+                 from member
+                 where email = %s and deleted = FALSE"""
+        cursor.execute(sql, (email,))
+        row = cursor.fetchone()
+    except Exception as e:
+        print('데이터 저장 실패', e)
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+    return row
+
+
+8. 로그인 처리 수정
+
+   auth_view.py 의 로그인 route 함수 수정
+
+@auth_bp.route("/login/", methods=['GET', 'POST']) # 실제 경로 매핑 /auth/lgoin ( url_prefix와 결합 )
+def login():
+    if request.method.lower() == 'get':
+        return render_template("auth/login.html")
+    else:
+        # 1. 요청 데이터 읽기
+        email = request.form.get('email', '11')
+        passwd = request.form.get('passwd', '22')
+        remember = request.form.get('remember', '33')
+        # return f'{email}, {passwd}, {remember}'
+
+        # 2. 요청 처리
+        row = member_util.select_member_by_email(email)        
+        print(row)
+        if not row: # 조회된 row가 없다면
+            return render_template("auth/login.html", 
+                                   message="존재하지 않는 아이디입니다.") # 템플릿(.html)에 전달되는 데이터
+
+        # if email == 'iamuser@example.com' and passwd == '12345': # 로그인 성공
+        if check_password_hash(row[1], passwd): # 로그인 성공
+            session['loginuser'] = email # 로그인 처리 : 세션에 로그인 관련 데이터 저장
+            # return render_template('index.html')
+            return redirect(url_for('main.index')) # main blueprint의 index함수에 연결된 경로로 이동
+        else:   # 로그인 실패
+            # 3. 응답 컨텐츠 만들기
+            return render_template("auth/login.html",
+                                   message="패스워드를 확인하세요")
+            # return redirect(url_for('auth.login'))
+
+
+9. login.html 파일 수정
+
+   {% include "page_modules/common_js.html" %}
+
+    <script>
+        const message = '{{ message }}'; // {{ message }} : render_template('path', message='...')에서 전달
+        if (message) {
+            alert(message);
+        }
+    </script>
+
