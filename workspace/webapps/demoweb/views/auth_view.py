@@ -32,3 +32,11 @@ def logout():
     session.clear() # session의 모든 데이터 제거
 
     return redirect(url_for('main.index'))
+
+
+@auth_bp.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method.lower() == 'get':
+        return render_template('auth/register.html')
+    else:
+        pass
