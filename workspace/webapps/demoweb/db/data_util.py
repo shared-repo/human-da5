@@ -19,14 +19,15 @@ def create_titanic_table():
                     ,Pclass int null
                     ,Name varchar(100) null
                     ,Sex varchar(10) null
-                    ,Age int null
+                    ,Age float null
                     ,SibSp int null
                     ,Parch int null
                     ,Ticket varchar(50) null
                     ,Fare float null
-                    ,Cabin varchar(10) null
+                    ,Cabin varchar(100) null
                     ,Embarked char(1) null
                 );"""
+        cursor.execute(sql)
         
     except Exception as e:
         print('테이블 생성 실패', e)
@@ -55,3 +56,27 @@ def insert_titanic_data(data):
             cursor.close()
         if conn:
             conn.close()
+
+
+def select_titanic():
+    rows = None
+    try:
+        conn = pymysql.connect(host="localhost", 
+                               database='demoweb', 
+                               user='humanda5', 
+                               password='humanda5')
+        
+        cursor = conn.cursor()
+
+        sql = "select * from titanic"
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+    except Exception as e:
+        print('데이터 저장 실패', e)
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+    return rows
