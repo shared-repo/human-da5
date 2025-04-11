@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Form</title>
+</head>
+<body>
+
+    <button id="btn">눌러주세요</button>
+    <hr>
+    <div id="msg"></div>
+
+    <script>
+        // 1. 찾기
+        const btn = document.querySelector('#btn');
+        // 2. 사용 (이벤트연결)
+        btn.addEventListener('click', function(event) {
+
+            // 1. 찾기
+            const msg = document.querySelector('#msg');
+            // 2. 사용
+            msg.innerHTML = new Date();
+
+        });
+    </script>
+    
+</body>
+</html>
