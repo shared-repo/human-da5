@@ -45,37 +45,21 @@
                 <div class="table-responsive table-responsive-data2">                    
                     <table class="table table-data2">
                         <thead>
-                            <tr>                                
-                                <th>PassengerId</th>
-                                <th>Survived</th>
-                                <th>Pclass</th>
-                                <th>Name</th>
-                                <th>Sex</th>
-                                <th>Age</th>
-                                <th>SibSp</th>
-                                <th>Parch</th>
-                                <th>Ticket</th>
-                                <th>Fare</th>
-                                <th>Cabin</th>
-                                <th>Embarked</th>
+                            <tr>
+                                {% for c in df.columns %}
+                                <th>{{ c }}</th>
+                                {% endfor %}
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="tr-shadow">                                
-                                <td>Lori Lynch</td>
-                                <td>Lori Lynch</td>
-                                <td>Lori Lynch</td>
-                                <td>Lori Lynch</td>
-                                <td>Lori Lynch</td>
-                                <td>Lori Lynch</td>
-                                <td>Lori Lynch</td>
-                                <td>Lori Lynch</td>
-                                <td>Lori Lynch</td>
-                                <td>Lori Lynch</td>
-                                <td>Lori Lynch</td>
-                                <td>Lori Lynch</td>
+                            {% for row in df.values %} 
+                            <tr class="tr-shadow">
+                                {% for v in row %} 
+                                <td>{{ v }}</td>
+                                {% endfor %}                                
                             </tr>
-                            <tr class="spacer"></tr>                            
+                            <tr class="spacer"></tr> 
+                            {% endfor %}                           
                         </tbody>
                     </table>
                 </div>
