@@ -1,0 +1,213 @@
+[ 페이징 구현 ]
+
+
+1. 요청 데이터에서 페이지 번호 읽기
+
+    data_view.py에 다음 구현 추가
+
+@data_bp.route('/titanic-with-page', methods=['GET'])
+def titanic_with_page():
+
+    # 요청 데이터 읽기 ( 페이지 번호 읽기 )
+    page_no = request.args.get('page_no', '1')
+    page_no = int(page_no)
+
+    page_size = 10 # 한 페이지에 보여줄 데이터 갯수
+    page_start = (page_no - 1) * page_size # 현재 페이지에서 보여줄 데이터의 시작 번호
+
+    # 데이터베이스에서 해당 페이지의 데이터 읽기
+    rows = data_util.select_titanic_by_page(page_start,page_size)
+    df_titanic = pd.DataFrame(rows, columns=['PassengerId','Survived','Pclass','Name','Sex','Age','SibSp','Parch','Ticket','Fare','Cabin','Embarked'])
+
+    # 템플릿으로 이동 ( 위에서 읽은 데이터 전달 )
+    return render_template('data/titanic_by_page.html', df=df_titanic, pager=pager)
+
+
+2. 데이터베이스 조회 기능 추가
+
+data_util.py 파일에 아래 함수 추가
+
+def select_titanic_by_page(page_start, page_size):
+    rows = None
+    try:
+        conn = pymysql.connect(host="localhost", 
+                               database='demoweb', 
+                               user='humanda5', 
+                               password='humanda5')
+        
+        cursor = conn.cursor()
+
+        sql = "select * from titanic limit %s,%s"
+        cursor.execute(sql, (page_start, page_size))
+        rows = cursor.fetchall()
+    except Exception as e:
+        print('데이터 저장 실패', e)
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+    return rows
+
+
+3. 템플릿 파일 생성
+
+   titanic.html 파일 복사해서 titanic_by_page.html 파일 만들기
+
+
+4. 메뉴 링크 수정 
+
+    base.html 파일 88라인 부근 코드를 아래와 같이 수정
+
+		        <ul class="header3-sub-list list-unstyled">
+                                    <li>
+                                        <a href="{{ url_for('data.init_titanic') }}">Initialize Titanic</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ url_for('data.titanic') }}">Titanic</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ url_for('data.titanic_by_page') }}">Titanic by Page</a>
+                                    </li>
+                                </ul>
+
+
+5. 실행 테스트
+
+   페이지 번호를 변경하면서 아래와 같이 테스트
+
+   http://locaohost:5000/data/titanic_by_page?page_no=3
+   http://locaohost:5000/data/titanic_by_page?page_no=7
+
+
+6. page  번호 표시기 추가
+
+    페이지 번호 표시기 찾기
+    https://getbootstrap.com/docs/4.6/components/pagination/ 에서 적절한 페이지 번호 표시기 선택 후 복사
+
+    페지이 번호 표시기 적용
+    titanic_by_page.html 파일의 66라인 부근에 아래 코드 추가
+
+        </table>
+    </div>
+
+    <nav aria-label="Page navigation example">
+  <ul class="pagination">
+    <li class="page-item">
+      <a class="page-link" href="#" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    <li class="page-item"><a class="page-link" href="#">1</a></li>
+    <li class="page-item"><a class="page-link" href="#">2</a></li>
+    <li class="page-item"><a class="page-link" href="#">3</a></li>
+    <li class="page-item">
+      <a class="page-link" href="#" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+
+7.  실행 및 확인
+
+
+8. 페이지 번호 표시기 처리를 위한 Blueprint 구현 
+
+   data_view.py 파일의 titanic_by_page 함수 내용 수정
+
+@data_bp.route('/titanic-by-page', methods=['GET'])
+def titanic_by_page():
+
+    # 요청 데이터 읽기 ( 페이지 번호 읽기 )
+    page_no = request.args.get('page_no', '1')
+    page_no = int(page_no)
+
+    pager = {
+        "page_no" : page_no,
+        "page_size" :  10, # 한 페이지에 표시할 행의 수
+        "pager_size" : 5 # 페이지 번호 표시 갯수
+    }
+    
+    data_cnt = data_util.select_titanic_count() # 전체 데이터 갯수
+
+    pager['page_cnt'] = math.ceil(data_cnt / pager['page_size']) # 나눗셈 + 올림
+    pager['page_start'] = ( (pager['page_no'] - 1) // pager['pager_size'] ) * pager['pager_size'] + 1
+    pager['page_stop'] = pager['page_start'] + pager['pager_size']
+
+    page_start = (page_no - 1) * 10 # 현재 페이지에서 보여줄 데이터의 시작 번호
+
+    # 데이터베이스에서 해당 페이지의 데이터 읽기
+    rows = data_util.select_titanic_by_page(page_start, pager['page_size'])
+    df_titanic = pd.DataFrame(rows, columns=['PassengerId','Survived','Pclass','Name','Sex','Age','SibSp','Parch','Ticket','Fare','Cabin','Embarked'])
+
+    # 템플릿으로 이동 ( 위에서 읽은 데이터 전달 )
+    return render_template('data/titanic_by_page.html', df=df_titanic, pager=pager)
+
+
+9. 템플릿 수정
+
+   titanic_by_page.html 파일 68라인 부근 내용 수정
+
+<nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('data.titanic_by_page', page_no=1) }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <li class="page-item">
+                            {% if pager['page_no'] > 1 %}
+                            <a class="page-link" href="{{ url_for('data.titanic_by_page', page_no=pager['page_no']-1) }}" aria-label="Previous">
+                                <span aria-hidden="true">&lt;</span>
+                            </a>
+                            {% else %}
+                            <a class="page-link" href="javascript:" aria-label="Previous">
+                                <span aria-hidden="true">&lt;</span>
+                            </a>
+                            {% endif %}
+                        </li>
+
+                        {% for page_no in range(pager['page_start'], pager['page_stop']) %}
+                        {% if page_no != pager['page_no'] %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('data.titanic_by_page', page_no=page_no) }}">{{page_no}}</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:">{{page_no}}</a>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+
+                        <li class="page-item">
+                            {% if pager['page_no'] < pager['page_cnt'] %}
+                            <a class="page-link" href="{{ url_for('data.titanic_by_page', page_no=pager['page_no']+1) }}" aria-label="Previous">
+                                <span aria-hidden="true">&gt;</span>
+                            </a>
+                            {% else %}
+                            <a class="page-link" href="javascript:" aria-label="Previous">
+                                <span aria-hidden="true">&gt;</span>
+                            </a>
+                            {% endif %}
+                        </li>
+
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('data.titanic_by_page', page_no=pager['page_cnt']) }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                  </nav>
+
+
+10. 실행 및 확인
+
+   
+
+
