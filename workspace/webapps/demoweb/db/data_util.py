@@ -80,3 +80,51 @@ def select_titanic():
             conn.close()
 
     return rows
+
+
+def select_titanic_by_page(page_start, page_size):
+    rows = None
+    try:
+        conn = pymysql.connect(host="localhost", 
+                               database='demoweb', 
+                               user='humanda5', 
+                               password='humanda5')
+        
+        cursor = conn.cursor()
+
+        sql = "select * from titanic limit %s,%s"
+        cursor.execute(sql, (page_start, page_size))
+        rows = cursor.fetchall()
+    except Exception as e:
+        print('데이터 저장 실패', e)
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+    return rows
+
+
+def select_titanic_count():
+    cnt = None
+    try:
+        conn = pymysql.connect(host="localhost", 
+                               database='demoweb', 
+                               user='humanda5', 
+                               password='humanda5')
+        
+        cursor = conn.cursor()
+
+        sql = "select count(*) from titanic"
+        cursor.execute(sql)
+        cnt = cursor.fetchone()
+    except Exception as e:
+        print('데이터 조회 실패', e)
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+    return cnt[0]
