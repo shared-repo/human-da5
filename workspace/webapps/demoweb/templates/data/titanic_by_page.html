@@ -65,20 +65,56 @@
                 </div>
 
                 <nav aria-label="Page navigation example">
-                    <ul class="pagination">
-                      <li class="page-item">
-                        <a class="page-link" href="#" aria-label="Previous">
-                          <span aria-hidden="true">&laquo;</span>
-                        </a>
-                      </li>
-                      <li class="page-item"><a class="page-link" href="#">1</a></li>
-                      <li class="page-item"><a class="page-link" href="#">2</a></li>
-                      <li class="page-item"><a class="page-link" href="#">3</a></li>
-                      <li class="page-item">
-                        <a class="page-link" href="#" aria-label="Next">
-                          <span aria-hidden="true">&raquo;</span>
-                        </a>
-                      </li>
+                    <ul class="pagination justify-content-center">
+
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('data.titanic_by_page', page_no=1) }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <li class="page-item">
+                            {% if pager['page_no'] > 1 %}
+                            <a class="page-link" href="{{ url_for('data.titanic_by_page', page_no=pager['page_no']-1) }}" aria-label="Previous">
+                                <span aria-hidden="true">&lt;</span>
+                            </a>
+                            {% else %}
+                            <a class="page-link" href="javascript:" aria-label="Previous">
+                                <span aria-hidden="true">&lt;</span>
+                            </a>
+                            {% endif %}
+                        </li>
+
+                        {% for page_no in range(pager['page_start'], pager['page_stop']) %}
+                        {% if page_no != pager['page_no'] %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('data.titanic_by_page', page_no=page_no) }}">{{page_no}}</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:">{{page_no}}</a>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+
+                        <li class="page-item">
+                            {% if pager['page_no'] < pager['page_cnt'] %}
+                            <a class="page-link" href="{{ url_for('data.titanic_by_page', page_no=pager['page_no']+1) }}" aria-label="Previous">
+                                <span aria-hidden="true">&gt;</span>
+                            </a>
+                            {% else %}
+                            <a class="page-link" href="javascript:" aria-label="Previous">
+                                <span aria-hidden="true">&gt;</span>
+                            </a>
+                            {% endif %}
+                        </li>
+
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('data.titanic_by_page', page_no=pager['page_cnt']) }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+
                     </ul>
                   </nav>
 

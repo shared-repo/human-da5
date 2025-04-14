@@ -65,7 +65,7 @@ def titanic_by_page():
 
     pager['page_cnt'] = math.ceil(data_cnt / pager['page_size']) # 나눗셈 + 올림
     pager['page_start'] = ( (pager['page_no'] - 1) // pager['pager_size'] ) * pager['pager_size'] + 1
-    pager['pager_stop'] = pager['pager_start'] + pager['pager_size']
+    pager['page_stop'] = pager['page_start'] + pager['pager_size']
 
     page_start = (page_no - 1) * 10 # 현재 페이지에서 보여줄 데이터의 시작 번호
 
