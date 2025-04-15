@@ -8,6 +8,8 @@ from pathlib import Path
 
 import pandas as pd
 
+import yfinance as yf
+
 from ..db import data_util
 
 data_bp = Blueprint('data', __name__, url_prefix="/data")
@@ -75,3 +77,17 @@ def titanic_by_page():
 
     # 템플릿으로 이동 ( 위에서 읽은 데이터 전달 )
     return render_template('data/titanic_by_page.html', df=df_titanic, pager=pager)
+
+
+@data_bp.route('/stock-chart', methods=['GET'])
+def stock_chart():
+
+    quotes = {}
+    for code in ['005930.KS', '000100.KS', '000660.KS', '005380.KS']:
+        ticker = yf.Ticker(code)
+        history = ticker.history(start='2011-01-01', interval='1d')
+        history.reset_index(inplace=True)
+        history['Date'] = history['Date'].map(lambda v: v.strftime('%Y-%m-%d')) # datetime -> '1234-12-12'
+        quotes.update({ code: history })
+
+    return render_template('data/stock_chart.html', quotes=quotes)
