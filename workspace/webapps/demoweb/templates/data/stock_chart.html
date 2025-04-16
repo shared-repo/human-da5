@@ -8,7 +8,7 @@
             <div class="col-lg-12">
                 <div class="au-card m-b-30">
                     <div class="au-card-inner">
-                        <h3 class="title-2 m-b-40">Stock Price</h3>
+                        <h3 class="title-2 m-b-40">Stock Price</h3>                        
                         <canvas id="stock-chart"></canvas>
                     </div>
                 </div>
@@ -22,6 +22,7 @@
 {% block js_block %}
 
 <script>
+{% if quotes %}
 try {
     //Sales chart
     var ctx = document.querySelector("#stock-chart");
@@ -79,9 +80,9 @@ try {
             intersect: false,
           },
           legend: {
-            display: false,
+            display: true,
             labels: {
-              usePointStyle: true,
+              usePointStyle: false,
               fontFamily: 'Poppins',
             },
           },
@@ -129,7 +130,7 @@ try {
   } catch (error) {
     console.log(error);
   }
-  
+{% endif %}
 </script>
 
 {% endblock %}
