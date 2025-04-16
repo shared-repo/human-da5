@@ -79,15 +79,29 @@ def titanic_by_page():
     return render_template('data/titanic_by_page.html', df=df_titanic, pager=pager)
 
 
-@data_bp.route('/stock-chart', methods=['GET'])
+@data_bp.route('/stock-chart', methods=['GET', 'POST'])
 def stock_chart():
 
-    quotes = {}
-    for code in ['005930.KS', '000100.KS', '000660.KS', '005380.KS']:
-        ticker = yf.Ticker(code)
-        history = ticker.history(start='2011-01-01', interval='1d')
-        history.reset_index(inplace=True)
-        history['Date'] = history['Date'].map(lambda v: v.strftime('%Y-%m-%d')) # datetime -> '1234-12-12'
-        quotes.update({ code: history })
+    # 파일에서 데이터 읽기
+    bp_path = data_bp.root_path # 현재 blueprint의 경로 ( 여기서는 views )
+    root_path = Path(bp_path).parent #  부모 경로 (여기서는 demoweb )
+    file_path = os.path.join(root_path, 'data_files', 'stock-code.csv')
+    df_stock_code = pd.read_csv(file_path)    
 
-    return render_template('data/stock_chart.html', quotes=quotes)
+    quotes = []
+    if request.method.lower() == 'post':
+        stock1 = request.form.get('stock1')
+        stock2 = request.form.get('stock2')
+        stock3 = request.form.get('stock3')
+        # for code in ['005930.KS', '000100.KS', '000660.KS', '005380.KS']:
+        for code in [stock1, stock2, stock3]:
+            if len(code) < 9:
+                code = '0' * (9-len(code)) + code # 000000.KS 형식으로 만들기
+            ticker = yf.Ticker(code)
+            history = ticker.history(start='2021-01-01', interval='1d')
+            history.reset_index(inplace=True)
+            history['Date'] = history['Date'].map(lambda v: v.strftime('%Y-%m-%d')) # datetime -> '1234-12-12'
+            # quotes.update({ code: history })
+            quotes.append([code, history['Date'].to_list(), history['Close'].to_list()])
+
+    return render_template('data/stock_chart.html', stock_code=df_stock_code, quotes=quotes)

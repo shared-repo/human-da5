@@ -8,7 +8,37 @@
             <div class="col-lg-12">
                 <div class="au-card m-b-30">
                     <div class="au-card-inner">
-                        <h3 class="title-2 m-b-40">Stock Price</h3>                        
+                        <h3 class="title-2 m-b-40">Stock Price</h3>
+                        <form action="{{ url_for('data.stock_chart') }}" method="post">
+                          <div class="row form-group">                          
+                            <div class="col-3">
+                                <select name="stock1" class="form-control">
+                                {% for row in stock_code.values %}
+                                  <option value="{{ row[1] }}">{{ row[0] }}</option>
+                                {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-3">
+                              <select name="stock2" class="form-control">
+                                {% for row in stock_code.values %}
+                                  <option value="{{ row[1] }}">{{ row[0] }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                            <div class="col-3">
+                              <select name="stock3" class="form-control">
+                                {% for row in stock_code.values %}
+                                  <option value="{{ row[1] }}">{{ row[0] }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                            <div class="col-3">
+                              <button type="submit" class="btn btn-info btn-block">
+                                조회
+                              </button>
+                            </div>
+                          </div>
+                          </form>
                         <canvas id="stock-chart"></canvas>
                     </div>
                 </div>
@@ -31,12 +61,12 @@ try {
       var myChart = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: {{ quotes['005930.KS']['Date'].to_list()|safe }}, // : |safe --> 문자열을 있는 그대로 표현
+          labels: {{ quotes[0][1]|safe }}, // : |safe --> 문자열을 있는 그대로 표현
           type: 'line',
           defaultFontFamily: 'Poppins',
           datasets: [{
-            label: "삼성전자",
-            data: {{ quotes['005930.KS']['Close'].to_list() }},
+            label: '{{ quotes[0][0]|safe }}',
+            data: {{ quotes[0][2] }},
             backgroundColor: 'transparent',
             borderColor: 'rgba(220,53,69,0.75)',
             borderWidth: 1,
@@ -45,8 +75,8 @@ try {
             pointBorderColor: 'transparent',
             pointBackgroundColor: 'rgba(220,53,69,0.75)',
           }, {
-            label: "유한양행",
-            data: {{ quotes['000100.KS']['Close'].to_list() }},
+            label: '{{ quotes[1][0]|safe }}',
+            data: {{ quotes[1][2] }},
             backgroundColor: 'transparent',
             borderColor: 'rgba(40,167,69,0.75)',
             borderWidth: 1,
@@ -55,8 +85,8 @@ try {
             pointBorderColor: 'transparent',
             pointBackgroundColor: 'rgba(40,167,69,0.75)',
           }, {
-            label: "SK하이닉스",
-            data: {{ quotes['000660.KS']['Close'].to_list() }},
+            label: '{{ quotes[2][0]|safe }}',
+            data: {{ quotes[2][2] }},
             backgroundColor: 'transparent',
             borderColor: 'rgba(40,53,200,0.75)',
             borderWidth: 1,
@@ -131,6 +161,7 @@ try {
     console.log(error);
   }
 {% endif %}
+
 </script>
 
 {% endblock %}
