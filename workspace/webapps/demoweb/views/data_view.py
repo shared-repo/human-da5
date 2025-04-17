@@ -1,5 +1,5 @@
 from flask import Blueprint
-from flask import render_template, redirect, url_for
+from flask import render_template, redirect, url_for, jsonify
 from flask import request
 
 import os
@@ -105,3 +105,36 @@ def stock_chart():
             quotes.append([code, history['Date'].to_list(), history['Close'].to_list()])
 
     return render_template('data/stock_chart.html', stock_code=df_stock_code, quotes=quotes)
+
+
+@data_bp.route('/stock-chart_async', methods=['GET'])
+def stock_chart_async():
+
+    # 파일에서 데이터 읽기
+    bp_path = data_bp.root_path # 현재 blueprint의 경로 ( 여기서는 views )
+    root_path = Path(bp_path).parent #  부모 경로 (여기서는 demoweb )
+    file_path = os.path.join(root_path, 'data_files', 'stock-code.csv')
+    df_stock_code = pd.read_csv(file_path)
+
+    return render_template('data/stock_chart_async.html', stock_code=df_stock_code)
+
+
+@data_bp.route('/get-stock-quotes', methods=['GET'])
+def get_stock_quotes():
+
+    quotes = []
+    stock1 = request.args.get('stock1')
+    stock2 = request.args.get('stock2')
+    stock3 = request.args.get('stock3')
+    # if request.method.lower() == 'post':
+    for code in [stock1, stock2, stock3]:
+        if len(code) < 9:
+            code = '0' * (9-len(code)) + code # 000000.KS 형식으로 만들기
+        ticker = yf.Ticker(code)
+        history = ticker.history(start='2021-01-01', interval='1d')
+        history.reset_index(inplace=True)
+        history['Date'] = history['Date'].map(lambda v: v.strftime('%Y-%m-%d')) # datetime -> '1234-12-12'
+        # quotes.update({ code: history })
+        quotes.append([code, history['Date'].to_list(), history['Close'].to_list()])
+
+    return jsonify(quotes) # 객체를 json 형식으로 변환해서 응답
