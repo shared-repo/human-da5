@@ -1,0 +1,292 @@
+1. 링크 수정
+
+   base.html 100라인 부근 코드 추가
+
+   <li>
+         <a href="{{ url_for('data.stock_chart_async') }}">Stock Chart Async</a>
+   </li>
+
+
+2. view 코드 수정
+
+   data_view.py에 코드 추가
+
+@data_bp.route('/stock-chart_async', methods=['GET'])
+def stock_chart_async():
+
+    # 파일에서 데이터 읽기
+    bp_path = data_bp.root_path # 현재 blueprint의 경로 ( 여기서는 views )
+    root_path = Path(bp_path).parent #  부모 경로 (여기서는 demoweb )
+    file_path = os.path.join(root_path, 'data_files', 'stock-code.csv')
+    df_stock_code = pd.read_csv(file_path)
+
+    return render_template('data/stock_chart_async.html', stock_code=df_stock_code)
+
+3. 
+
+    stock_chart.html을 복사해서 stock_chart_async.html 파일 만들기
+
+    form 내용 수정
+
+<form id="code-select-form">
+                          <div class="row form-group">                          
+                            <div class="col-3">
+                                <select name="stock1" id="stock1" class="form-control">
+                                {% for row in stock_code.values %}
+                                  <option value="{{ row[1] }}">{{ row[0] }}</option>
+                                {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-3">
+                              <select name="stock2" id="stock2" class="form-control">
+                                {% for row in stock_code.values %}
+                                  <option value="{{ row[1] }}">{{ row[0] }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                            <div class="col-3">
+                              <select name="stock3" id="stock3" class="form-control">
+                                {% for row in stock_code.values %}
+                                  <option value="{{ row[1] }}">{{ row[0] }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                            <div class="col-3">
+                              <button type="button" id="btn-get-data" class="btn btn-info btn-block">
+                                조회
+                              </button>
+                            </div>
+                          </div>
+                          </form>
+
+4. javascript 코드 수정 1
+    <script> 태그 아래에 다음 코드 추가
+
+    $(function() {
+
+  const btn = $('#btn-get-data'); // document.querySelector('#btn-get-data')
+  btn.on('click', function(event) { // btn.addEventListener('click', function(event) {
+    alert('test');
+  });
+
+});
+
+
+5. javsactipt 코드 수정 2
+
+   입력 데이터를 읽는 코드 추가
+
+  const btn = $('#btn-get-data'); // document.querySelector('#btn-get-data')
+  btn.on('click', function(event) { // btn.addEventListener('click', function(event) {
+    // const stock1 = $('#stock1').val();  // document.querySelect('#stock1').value
+    // const stock2 = $('#stock2').val();
+    // const stock3 = $('#stock3').val();
+    // alert(`${stock1}, ${stock2}, ${stock3}`); // f'{stock1}'
+
+    const code_data = $('#code-select-form').serialize(); // form 내부의 모든 입력요소 값을 추출
+    alert(code_data);
+
+  });
+
+6. javascript 코드 수정 3
+
+$(function() {
+
+  const btn = $('#btn-get-data'); // document.querySelector('#btn-get-data')
+  btn.on('click', function(event) { // btn.addEventListener('click', function(event) {
+    // const stock1 = $('#stock1').val();  // document.querySelect('#stock1').value
+    // const stock2 = $('#stock2').val();
+    // const stock3 = $('#stock3').val();
+    // alert(`${stock1}, ${stock2}, ${stock3}`); // f'{stock1}'
+
+    const code_data = $('#code-select-form').serialize(); // form 내부의 모든 입력요소 값을 추출
+    // alert(code_data);
+
+    $.ajax({
+      "url": "{{ url_for('data.get_stock_quotes') }}",
+      "method": "get",
+      "data": code_data,
+      "dataType": "json", // 수신 데이터 타입
+      "success": function(data, status, xhr) { // 비동기 요청이 성공적으로 응답하면 호출되는 함수
+        console.log(data);
+ 
+      },
+      "error": function(xhr, status, err) {// 비동기 요청에 오류가 발생하면 호출되는 함수
+        alert('오류 발생');
+      }
+    })
+
+  });
+
+});
+
+7. data_view.py 수정
+
+   route 함수 추가
+
+@data_bp.route('/get-stock-quotes', methods=['GET'])
+def get_stock_quotes():
+
+    quotes = []
+    stock1 = request.args.get('stock1')
+    stock2 = request.args.get('stock2')
+    stock3 = request.args.get('stock3')
+    # if request.method.lower() == 'post':
+    for code in [stock1, stock2, stock3]:
+        if len(code) < 9:
+            code = '0' * (9-len(code)) + code # 000000.KS 형식으로 만들기
+        ticker = yf.Ticker(code)
+        history = ticker.history(start='2021-01-01', interval='1d')
+        history.reset_index(inplace=True)
+        history['Date'] = history['Date'].map(lambda v: v.strftime('%Y-%m-%d')) # datetime -> '1234-12-12'
+        # quotes.update({ code: history })
+        quotes.append([code, history['Date'].to_list(), history['Close'].to_list()])
+
+    return jsonify(quotes) # 객체를 json 형식으로 변환해서 응답
+
+
+8. javascript 수정 4
+
+$(function() {
+
+  const btn = $('#btn-get-data'); // document.querySelector('#btn-get-data')
+  btn.on('click', function(event) { // btn.addEventListener('click', function(event) {
+    // const stock1 = $('#stock1').val();  // document.querySelect('#stock1').value
+    // const stock2 = $('#stock2').val();
+    // const stock3 = $('#stock3').val();
+    // alert(`${stock1}, ${stock2}, ${stock3}`); // f'{stock1}'
+
+    const code_data = $('#code-select-form').serialize(); // form 내부의 모든 입력요소 값을 추출
+    // alert(code_data);
+
+    $.ajax({
+      "url": "{{ url_for('data.get_stock_quotes') }}",
+      "method": "get",
+      "data": code_data,
+      "dataType": "json", // 수신 데이터 타입
+      "success": function(data, status, xhr) { // 비동기 요청이 성공적으로 응답하면 호출되는 함수
+        // console.log(data);
+        try {
+          var ctx = document.querySelector("#stock-chart").getContext('2d');
+          if (ctx) {
+            ctx.height = 150;
+            var myChart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: data[0][1],
+                type: 'line',
+                defaultFontFamily: 'Poppins',
+                datasets: [{
+                  label: data[0][0],
+                  data: data[0][2],
+                  backgroundColor: 'transparent',
+                  borderColor: 'rgba(220,53,69,0.75)',
+                  borderWidth: 1,
+                  pointStyle: 'circle',
+                  pointRadius: 1,
+                  pointBorderColor: 'transparent',
+                  pointBackgroundColor: 'rgba(220,53,69,0.75)',
+                }, {
+                  label: data[1][0],
+                  data: data[1][2],
+                  backgroundColor: 'transparent',
+                  borderColor: 'rgba(40,167,69,0.75)',
+                  borderWidth: 1,
+                  pointStyle: 'circle',
+                  pointRadius: 1,
+                  pointBorderColor: 'transparent',
+                  pointBackgroundColor: 'rgba(40,167,69,0.75)',
+                }, {
+                  label: data[2][0],
+                  data: data[2][2],
+                  backgroundColor: 'transparent',
+                  borderColor: 'rgba(40,53,200,0.75)',
+                  borderWidth: 1,
+                  pointStyle: 'circle',
+                  pointRadius: 1,
+                  pointBorderColor: 'transparent',
+                  pointBackgroundColor: 'rgba(40,53,200,0.75)',
+                }]
+              },
+              options: {
+                responsive: true,
+                tooltips: {
+                  mode: 'index',
+                  titleFontSize: 12,
+                  titleFontColor: '#000',
+                  bodyFontColor: '#000',
+                  backgroundColor: '#fff',
+                  titleFontFamily: 'Poppins',
+                  bodyFontFamily: 'Poppins',
+                  cornerRadius: 3,
+                  intersect: false,
+                },
+                legend: {
+                  display: true,
+                  labels: {
+                    usePointStyle: false,
+                    fontFamily: 'Poppins',
+                  },
+                },
+                scales: {
+                  xAxes: [{
+                    display: true,
+                    gridLines: {
+                      display: false,
+                      drawBorder: false
+                    },
+                    scaleLabel: {
+                      display: false,
+                      labelString: 'Month'
+                    },
+                    ticks: {
+                      fontFamily: "Poppins"
+                    }
+                  }],
+                  yAxes: [{
+                    display: true,
+                    gridLines: {
+                      display: false,
+                      drawBorder: false
+                    },
+                    scaleLabel: {
+                      display: true,
+                      labelString: 'Value',
+                      fontFamily: "Poppins"
+
+                    },
+                    ticks: {
+                      fontFamily: "Poppins"
+                    }
+                  }]
+                },
+                title: {
+                  display: false,
+                  text: 'Normal Legend'
+                }
+              }
+            });
+          }
+
+
+        } catch (error) {
+          console.log(error);
+        }
+      },
+      "error": function(xhr, status, err) {// 비동기 요청에 오류가 발생하면 호출되는 함수
+        alert('오류 발생');
+      }
+    })
+
+  });
+
+});
+
+
+
+
+
+
+
+
+
