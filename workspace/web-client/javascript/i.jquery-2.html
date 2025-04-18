@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM Element</title>
+</head>
+<body>
+
+    <button id="selectBtn"></button>
+
+    <table id="numbersTbl">
+        <tr id="buttonRow"></tr>
+        <tr id="numbersRow"></tr>
+    </table>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"></script>
+
+    <script>
+
+        // button 요소 찾기
+        const btn = $('#selectBtn'); // document.querySelector("#selectBtn");
+        btn.html("SELECT WINNING NUMBERS"); // btn.innerHTML = "SELECT WINNING NUMBERS";
+        btn.css({'width': '100%', 'height': '50px'});   // btn.style.width = "100%"; 
+                                                        // btn.style.height = "50px";        
+
+        // td 요소 만들기 + button 요소 추가
+        const td1 = $('<td></td>'); // document.createElement('td');
+        td1.attr('colspan', 6); // td1.setAttribute("colspan", 6); // <td colspan="6" 으로 설정
+        td1.append(btn); //td1.appendChild(btn)
+
+        // button tr 요소 찾기 + td1 추가
+        const tr1 = $('#buttonRow'); // document.querySelector("#buttonRow");
+        tr1.append(td1);    //tr1.appendChild(td1)
+
+        // numbers tr 요소 찾기
+        const tr2 = $('#numbersRow'); // document.querySelector("#numbersRow");
+
+        // td 요소 6개 만들기 -> tr에 추가
+        for (let i = 0; i < 6; i++) { // python : for i in range(6):
+            const td = $('<td></td>'); // document.createElement('td'); // 새 요소 만들기
+            td.css({'width': '50px',            // td.style.width = '50px';
+                    'height': '50px',           // td.style.height = '50px';
+                    'text-align':'center',      // td.style.textAlign = 'center';
+                    'border': 'solid 1px'});    // td.style.border = 'solid 1px';
+            
+            tr2.append(td); // td 요소를 tr요소의 자식으로 추가하기
+        }
+
+        /////////////////////////////////////////////////////////
+
+        // button click 이벤트 처리기 연결
+        // btn.onclick = function(event) {
+        btn.on('click', (event) => { // btn.onclick = (event) => {
+
+            tds = $('#numbersRow td'); // document.querySelectorAll('#numbersRow td');
+
+            tds.each(function(idx, td) {    // for (let i = 0; i < tds.length; i++) {
+                // 번호 뽑기 (1 ~ 45 범위 난수)
+                n = Math.floor(Math.random() * 45) + 1;
+                // 번호 표시
+                $(td).html(n); // tds[i].innerHTML = n;
+            });
+
+        });
+
+
+    </script>
+    
+</body>
+</html>
