@@ -1,6 +1,11 @@
-from flask import Blueprint, request, render_template, redirect, url_for
+from flask import Blueprint, request, render_template, redirect, url_for, jsonify
+
+from openai import OpenAI
 
 example_bp = Blueprint("example", __name__, url_prefix="/")
+
+# 환경변수 OPENAI_API_KEY="key"가 설정된 후 사용 가능 : windows 에서는 set OPENAI_API_KEY=... 실행
+client = OpenAI()
 
 @example_bp.route("/process-data/", methods=['GET']) # GET 방식의 요청만 수신
 def process_get_data():
@@ -44,3 +49,26 @@ def template_syntax():
 @example_bp.route("/static-files/")
 def use_static_files():
     return render_template("show-static-files.html")
+
+# -----------------------------------------------------------
+
+@example_bp.route("/chatbot/")
+def chatbot():
+    return render_template('chatbot.html')
+
+@example_bp.route('/chatbot/chat-text/', methods=['POST'])
+def chat_text():
+    json_data = request.get_json()
+    message = json_data.get('message')
+
+    completion = client.chat.completions.create(
+        model="chatgpt-4o-latest",
+        messages=[
+            { "role": "system", "content": "당신은 모든 정보를 잘 알고 있는 친절한 안내자입니다. 질문에 대해 가능한 간결하게 답변해야 합니다." },
+            { "role": "user", "content": message }
+        ],
+        n=1,
+        temperature=1
+    )
+    
+    return jsonify({ 'message' : completion.choices[0].message.content })
