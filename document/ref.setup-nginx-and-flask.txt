@@ -1,0 +1,83 @@
+1. nginx 설치
+
+   download : https://nginx.org/en/download.html
+
+   unzip downloaded file
+
+2. nginx 실행
+
+   명령 프롬프트 실행 (cmd)
+
+   nginx 설치 경로(압축 해제 경로)로 이동
+
+   start nginx 명령 실행
+
+   웹 브라우저 실행 후 http://localhost 확인
+
+
+3. nginx에 flask 웹 애플리케이션 등록
+
+   nginx-home/nginx.conf 파일 편집기에서 열기
+
+   아래 내용 적용
+
+   server {
+        listen       80;
+        server_name  localhost;
+
+///////////////////////////////////////////////////////////
+
+   location / {
+	proxy_pass http://127.0.0.1:5000;
+	proxy_set_header Host $host;
+            proxy_set_header X_Real-IP $remote_addr;
+   }
+   location /static {
+	alias D:/instructor-och/human-da5/workspace/webapps/demoweb/static;
+   }
+
+4. gunicorn 미들웨어 설치
+
+   pip install gunicorn
+
+5. flask 웹 애플리케이션 시작
+
+   flask ~ run
+
+6. nginx 서버 재시작
+
+   nginx -s restart
+
+   or 
+
+   nginx -s stop
+   start nginx
+
+7. 브라우저에서 확인
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+server {
+        listen       80;
+        server_name  localhost;
+
+location / {
+			proxy_pass http://127.0.0.1:5000;
+			proxy_set_header Host $host;
+            proxy_set_header X_Real-IP $remote_addr;
+        }
+		location /static {
+			alias D:/instructor-och/human-da5/workspace/webapps/demoweb/static;
+		}
