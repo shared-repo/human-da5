@@ -6,6 +6,8 @@ def create_app(): # Flask framework와 약속된 이름의 함수 (역할 : appl
 
     app = Flask(__name__)
 
+    app.config['SECRET_KEY'] = "humanda5-secret-key"
+
     @app.route("/")
     def index():
         return render_template("index.html") # templates/index.html을 찾아서 처리한 후 응답

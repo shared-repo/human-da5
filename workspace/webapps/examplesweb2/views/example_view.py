@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template, redirect, url_for, jsonify
+from flask import Blueprint, request, render_template, redirect, url_for, jsonify, session
 
 from openai import OpenAI
 
@@ -70,5 +70,29 @@ def chat_text():
         n=1,
         temperature=1
     )
+    
+    return jsonify({ 'message' : completion.choices[0].message.content })
+
+@example_bp.route('/chatbot/chat-text-with-history/', methods=['POST'])
+def chat_text_with_history():
+    json_data = request.get_json()
+    message = json_data.get('message')
+
+    chat_history = session.get('chat-history', [])
+    if len(chat_history) == 0: # if chat_history:
+        chat_history.append({ "role": "system", "content": "당신은 모든 정보를 잘 알고 있는 친절한 안내자입니다. 질문에 대해 가능한 간결하게 답변해야 합니다." })
+
+    chat_history.append({ "role": "user", "content": message })
+
+    completion = client.chat.completions.create(
+        model="chatgpt-4o-latest",
+        messages=chat_history,
+        n=1,
+        temperature=1
+    )
+    
+    chat_history.append({ "role": "assistant", "content": completion.choices[0].message.content })
+
+    session['chat-history'] = chat_history
     
     return jsonify({ 'message' : completion.choices[0].message.content })

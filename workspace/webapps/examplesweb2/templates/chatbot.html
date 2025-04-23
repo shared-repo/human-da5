@@ -57,9 +57,11 @@
       }
 
       const generateResponse = (chatElement, message) => {
-          const messageElement = chatElement.find("p");
+          // const li = createChatLi(message, 'incoming');
+          // chatbox.append(li);
 
-          messageElement.text(message);
+          const messageElement = chatElement.find("p");          
+          messageElement.text(message);          
 
           chatbox.scrollTop(chatbox[0].scrollHeight);
       }
@@ -82,15 +84,21 @@
         chatbox.append(createChatLi(message, "outgoing")); // 대화창에 메시지 추가
         chatbox.scrollTop(chatbox[0].scrollHeight); // 마지막 메시지 위치로 스크롤 이동
 
+        const li = createChatLi("답변 준비중...", 'incoming');
+        chatbox.append(li);
+
         try {
-          const resp = await fetch("/chatbot/chat-text/", {
+          // const resp = await fetch("/chatbot/chat-text/", {
+          const resp = await fetch("/chatbot/chat-text-with-history/", {
               "method": "post", 
               "headers": {"Content-Type": "application/json;charset=utf-8"},
               "body": JSON.stringify({"message": message})
           });
 
           json_resp = await resp.json();
-          alert(json_resp.message);
+          // alert(json_resp.message);
+          generateResponse(li, json_resp.message);
+
 
         } catch (e) { // python에서는 except
         } finally {}
